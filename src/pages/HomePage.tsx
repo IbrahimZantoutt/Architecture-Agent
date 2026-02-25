@@ -1,11 +1,44 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Clock, Menu } from 'lucide-react'
+import { Clock, Menu, Calculator } from 'lucide-react'
 import { Logo } from '../components/ui/Logo'
 import { ChatInput } from '../components/ui/ChatInput'
 import { ModeCard } from '../components/ui/ModeCard'
 import { MODES } from '../lib/modes'
 import type { Mode } from '../types'
+
+// Infer the best mode from a free-form message. Falls back to 'plan' for
+// anything generic or ambiguous.
+function detectMode(message: string): Mode {
+  const t = message.toLowerCase()
+
+  // Devil's Advocate — stress-testing, arguing against decisions
+  if (/\b(devil|stress.?test|argue|argue against|flaw|weakness|weaknesses|counter|play devil)\b/.test(t))
+    return 'devils-advocate'
+
+  // Critic — asking for feedback, review, or jury-style critique
+  if (/\b(review|critique|critiqu|feedback|what do you think|thoughts on|evaluate|assess|jury|opinion on|rate my|judge)\b/.test(t))
+    return 'critic'
+
+  // Research — exploring topics, precedents, materials, theory
+  if (/\b(research|tell me about|what is|what are|history of|precedent|case stud|material|typolog|how does|examples of|learn about|explain what|who designed|famous)\b/.test(t))
+    return 'research'
+
+  // Writing — concept statements, descriptions, text polish
+  if (/\b(write|writing|statement|narrative|describe|put into words|concept note|design statement|help me write|rewrite|paraphrase|articulate)\b/.test(t))
+    return 'writing'
+
+  // Program — space lists, areas, adjacencies, brief numbers
+  if (/\b(program|space list|adjacen|circulation|square meter|sqm|sq ft|sqft|floor area|room list|how many rooms|how many spaces|space requirements|brief|accommodate)\b/.test(t))
+    return 'program'
+
+  // Help — specific design problem needing a solution approach
+  if (/\b(how do i|how to|help me|stuck|problem with|struggling|can't figure|what should i|advice on|suggest|approach to|deal with|fix)\b/.test(t))
+    return 'help'
+
+  // Default: plan
+  return 'plan'
+}
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -14,8 +47,8 @@ export function HomePage() {
 
   const handleSubmit = () => {
     if (!inputValue.trim()) return
-    // Default to plan mode when typing directly
-    navigate('/chat/plan', { state: { initialMessage: inputValue } })
+    const mode = detectMode(inputValue)
+    navigate(`/chat/${mode}`, { state: { initialMessage: inputValue } })
   }
 
   const handleModeSelect = (modeId: Mode) => {
@@ -30,6 +63,14 @@ export function HomePage() {
         <header className="flex items-center justify-between w-full" style={{ padding: '16px 48px' }}>
           <Logo size="lg" />
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/calculators')}
+              className="flex items-center gap-1.5 bg-bg-card rounded-[10px] border border-border font-outfit font-medium text-text-secondary hover:border-border-strong transition-colors"
+              style={{ padding: '8px 14px', fontSize: 13 }}
+            >
+              <Calculator size={16} color="#6B7280" />
+              Calculators
+            </button>
             <button
               className="flex items-center gap-1.5 bg-bg-card rounded-[10px] border border-border font-outfit font-medium text-text-secondary hover:border-border-strong transition-colors"
               style={{ padding: '8px 14px', fontSize: 13 }}
@@ -125,13 +166,23 @@ export function HomePage() {
           style={{ padding: '14px 20px' }}
         >
           <Logo size="sm" />
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex items-center justify-center bg-bg-card rounded-[10px] border border-border"
-            style={{ width: 36, height: 36 }}
-          >
-            <Menu size={18} color="#6B7280" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/calculators')}
+              className="flex items-center gap-1.5 bg-bg-card rounded-[10px] border border-border font-outfit font-medium text-text-secondary hover:border-border-strong transition-colors"
+              style={{ padding: '8px 14px', fontSize: 13 }}
+            >
+              <Calculator size={16} color="#6B7280" />
+              Calculators
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center justify-center bg-bg-card rounded-[10px] border border-border"
+              style={{ width: 36, height: 36 }}
+            >
+              <Menu size={18} color="#6B7280" />
+            </button>
+          </div>
         </header>
 
         {/* Mobile Hero */}

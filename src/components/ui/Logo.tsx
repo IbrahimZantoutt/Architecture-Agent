@@ -1,7 +1,6 @@
-import { PenTool } from 'lucide-react'
-
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
+  onClick?: () => void
 }
 
 const sizes = {
@@ -10,19 +9,18 @@ const sizes = {
   lg: { icon: 36, iconInner: 20, title: 20, credit: 13, gap: 8 },
 }
 
-export function Logo({ size = 'md' }: LogoProps) {
+export function Logo({ size = 'md', onClick }: LogoProps) {
   const s = sizes[size]
 
   return (
-    <div className="flex items-center" style={{ gap: s.gap }}>
-      {/* Icon */}
-      <div
-        className="flex items-center justify-center rounded-[10px] bg-accent flex-shrink-0"
-        style={{ width: s.icon, height: s.icon, borderRadius: size === 'lg' ? 10 : 8 }}
-      >
-        <PenTool size={s.iconInner} color="#FFFFFF" />
-      </div>
-
+    <div
+      className={`flex items-center${onClick ? ' cursor-pointer' : ''}`}
+      style={{ gap: s.gap }}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick() : undefined}
+    >
       {/* Text */}
       <span
         className="font-outfit font-bold text-text-primary"
