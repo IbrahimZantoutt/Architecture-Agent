@@ -14,12 +14,12 @@ export function ModeCard({ mode, onClick, compact = false }: ModeCardProps) {
     return (
       <button
         onClick={onClick}
-        className="w-full text-left bg-bg-card rounded-[20px] border border-border shadow-card hover:shadow-card-hover transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+        className="group w-full text-left bg-bg-card rounded-[20px] border border-border shadow-card hover:shadow-card-hover transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
         style={{ padding: 16, gap: 10, display: 'flex', flexDirection: 'column' }}
       >
         {/* Icon */}
         <div
-          className="flex items-center justify-center rounded-xl flex-shrink-0"
+          className="flex items-center justify-center rounded-xl flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
           style={{
             width: 40,
             height: 40,
@@ -51,13 +51,13 @@ export function ModeCard({ mode, onClick, compact = false }: ModeCardProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-bg-card rounded-[20px] border border-border shadow-card hover:shadow-card-hover transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
+      className="group w-full text-left bg-bg-card rounded-[20px] border border-border shadow-card hover:shadow-card-hover transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98]"
       style={{ padding: 24 }}
     >
       <div className="flex flex-col gap-4">
         {/* Icon */}
         <div
-          className="flex items-center justify-center rounded-xl flex-shrink-0"
+          className="flex items-center justify-center rounded-xl flex-shrink-0 transition-transform duration-300 group-hover:scale-110"
           style={{
             width: 48,
             height: 48,
@@ -84,7 +84,7 @@ export function ModeCard({ mode, onClick, compact = false }: ModeCardProps) {
         </span>
 
         {/* Arrow */}
-        <div className="flex justify-end">
+        <div className="flex justify-end transition-transform duration-200 group-hover:translate-x-1">
           <ArrowRight size={18} color="#E8607A" />
         </div>
       </div>

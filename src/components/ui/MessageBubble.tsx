@@ -63,7 +63,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 
   if (message.role === 'user') {
     return (
-      <div className="flex justify-end w-full">
+      <div className="flex justify-end w-full anim-msg-user">
         <div
           className="font-outfit bg-accent text-white leading-relaxed"
           style={{
@@ -82,7 +82,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   }
 
   return (
-    <div className="flex items-start gap-3 w-full">
+    <div className="flex items-start gap-3 w-full anim-msg-agent">
       {/* Avatar */}
       <div
         className="flex items-center justify-center rounded-full bg-accent flex-shrink-0"

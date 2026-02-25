@@ -59,3 +59,26 @@
     display: none;
   }
 }
+
+/* ─── Luxury entrance animations ─── */
+@keyframes archFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes archFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes archSlideRight {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes archSlideLeft {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.anim-fade-up   { animation: archFadeUp    0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-fade-in   { animation: archFadeIn    0.4s ease both; }
+.anim-msg-user  { animation: archSlideRight 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-msg-agent { animation: archSlideLeft  0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }

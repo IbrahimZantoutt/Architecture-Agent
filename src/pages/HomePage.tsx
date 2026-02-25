@@ -60,7 +60,7 @@ export function HomePage() {
       {/* ─── Desktop Layout ─── */}
       <div className="hidden md:flex flex-col min-h-screen">
         {/* Header */}
-        <header className="flex items-center justify-between w-full" style={{ padding: '16px 48px' }}>
+        <header className="flex items-center justify-between w-full anim-fade-in" style={{ padding: '16px 48px' }}>
           <Logo size="lg" />
           <div className="flex items-center gap-4">
             <button
@@ -83,8 +83,8 @@ export function HomePage() {
 
         {/* Hero */}
         <section
-          className="flex flex-col items-center text-center w-full"
-          style={{ padding: '40px 48px 24px' }}
+          className="flex flex-col items-center text-center w-full anim-fade-up"
+          style={{ padding: '40px 48px 24px', animationDelay: '60ms' }}
         >
           <h1
             className="font-outfit font-bold text-text-primary"
@@ -102,8 +102,8 @@ export function HomePage() {
 
         {/* Input */}
         <div
-          className="flex justify-center w-full"
-          style={{ padding: '0 48px 24px' }}
+          className="flex justify-center w-full anim-fade-up"
+          style={{ padding: '0 48px 24px', animationDelay: '150ms' }}
         >
           <div style={{ width: 680 }}>
             <ChatInput
@@ -120,8 +120,8 @@ export function HomePage() {
           style={{ padding: '0 48px 32px', gap: 20 }}
         >
           <span
-            className="font-outfit font-semibold text-text-muted uppercase tracking-widest"
-            style={{ fontSize: 13, letterSpacing: 1 }}
+            className="font-outfit font-semibold text-text-muted uppercase tracking-widest anim-fade-up"
+            style={{ fontSize: 13, letterSpacing: 1, animationDelay: '230ms' }}
           >
             or pick a mode
           </span>
@@ -131,8 +131,10 @@ export function HomePage() {
             className="grid w-full"
             style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, maxWidth: 1200 }}
           >
-            {MODES.slice(0, 4).map((mode) => (
-              <ModeCard key={mode.id} mode={mode} onClick={() => handleModeSelect(mode.id)} />
+            {MODES.slice(0, 4).map((mode, i) => (
+              <div key={mode.id} className="anim-fade-up" style={{ animationDelay: `${290 + i * 55}ms` }}>
+                <ModeCard mode={mode} onClick={() => handleModeSelect(mode.id)} />
+              </div>
             ))}
           </div>
 
@@ -141,8 +143,10 @@ export function HomePage() {
             className="grid"
             style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, maxWidth: 900, width: '100%' }}
           >
-            {MODES.slice(4).map((mode) => (
-              <ModeCard key={mode.id} mode={mode} onClick={() => handleModeSelect(mode.id)} />
+            {MODES.slice(4).map((mode, i) => (
+              <div key={mode.id} className="anim-fade-up" style={{ animationDelay: `${510 + i * 55}ms` }}>
+                <ModeCard mode={mode} onClick={() => handleModeSelect(mode.id)} />
+              </div>
             ))}
           </div>
         </section>
@@ -162,7 +166,7 @@ export function HomePage() {
       <div className="flex flex-col min-h-screen md:hidden">
         {/* Mobile Header */}
         <header
-          className="flex items-center justify-between w-full"
+          className="flex items-center justify-between w-full anim-fade-in"
           style={{ padding: '14px 20px' }}
         >
           <Logo size="sm" />
@@ -187,8 +191,8 @@ export function HomePage() {
 
         {/* Mobile Hero */}
         <section
-          className="flex flex-col items-center text-center w-full"
-          style={{ padding: '28px 20px 16px' }}
+          className="flex flex-col items-center text-center w-full anim-fade-up"
+          style={{ padding: '28px 20px 16px', animationDelay: '60ms' }}
         >
           <h1
             className="font-outfit font-bold text-text-primary"
@@ -202,7 +206,7 @@ export function HomePage() {
         </section>
 
         {/* Mobile Input */}
-        <div className="w-full" style={{ padding: '0 20px 16px' }}>
+        <div className="w-full anim-fade-up" style={{ padding: '0 20px 16px', animationDelay: '140ms' }}>
           <ChatInput
             value={inputValue}
             onChange={setInputValue}
@@ -213,21 +217,22 @@ export function HomePage() {
         {/* Mobile Cards */}
         <section className="flex flex-col w-full" style={{ padding: '0 20px', gap: 12 }}>
           <span
-            className="font-outfit font-semibold text-text-muted uppercase tracking-widest text-center"
-            style={{ fontSize: 12, letterSpacing: 1 }}
+            className="font-outfit font-semibold text-text-muted uppercase tracking-widest text-center anim-fade-up"
+            style={{ fontSize: 12, letterSpacing: 1, animationDelay: '200ms' }}
           >
             or pick a mode
           </span>
 
           {/* 2-column grid rows */}
           <div className="grid grid-cols-2" style={{ gap: 12 }}>
-            {MODES.map((mode) => (
-              <ModeCard
-                key={mode.id}
-                mode={mode}
-                compact
-                onClick={() => handleModeSelect(mode.id)}
-              />
+            {MODES.map((mode, i) => (
+              <div key={mode.id} className="anim-fade-up" style={{ animationDelay: `${250 + i * 45}ms` }}>
+                <ModeCard
+                  mode={mode}
+                  compact
+                  onClick={() => handleModeSelect(mode.id)}
+                />
+              </div>
             ))}
           </div>
 

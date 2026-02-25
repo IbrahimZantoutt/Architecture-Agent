@@ -21,7 +21,7 @@ export function ChatInput({ value, onChange, onSubmit, placeholder, disabled }: 
 
   return (
     <div
-      className="flex items-center gap-3 bg-bg-card rounded-2xl border border-border-strong"
+      className="flex items-center gap-3 bg-bg-card rounded-2xl border border-border-strong transition-[border-color,box-shadow] duration-200 focus-within:border-accent/50 focus-within:shadow-[0_0_0_3px_rgba(232,96,122,0.08)]"
       style={{ padding: '8px 8px 8px 20px', opacity: disabled ? 0.7 : 1 }}
     >
       <input
