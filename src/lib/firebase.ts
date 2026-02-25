@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
+import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDknBwdE-nc6qxR8hJqR-eEzc5IIFLbdDA',
@@ -13,5 +14,8 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig)
 
-// Analytics only in browser (not SSR-safe but fine for client-only Vite app)
+// Analytics only in browser
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null
+
+export const auth = getAuth(app)
+export const googleProvider = new GoogleAuthProvider()

@@ -9,6 +9,8 @@ import { LucideIcon } from '../components/ui/LucideIcon'
 import { MODES } from '../lib/modes'
 import { runAgent, type AgentStatus } from '../lib/agent'
 import { useSession } from '../contexts/SessionContext'
+import { useAuth } from '../contexts/AuthContext'
+import { saveSession } from '../lib/firestore'
 import type { Message, Mode } from '../types'
 
 // ─── Welcome messages per mode ────────────────────────────────────────────────
@@ -58,8 +60,12 @@ export function ChatPage() {
   // Guard against React StrictMode double-invoking the initial message effect
   const initialMessageSentRef = useRef(false)
 
+  const { user } = useAuth()
+
   const {
+    sessionId,
     projectContext,
+    messagesByMode,
     planCompleted,
     getMessagesForMode,
     setMessagesForMode,
@@ -168,8 +174,9 @@ export function ChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages (skip when only the welcome message is present)
   useEffect(() => {
+    if (messages.length <= 1) return
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
@@ -258,10 +265,42 @@ export function ChatPage() {
     navigate(`/chat/${modeId}`)
   }
 
-  const handleNewChat = () => {
+  // Always-fresh ref so save effects never have stale closure values.
+  // Merges local `messages` into messagesByMode for the current mode, since
+  // the context copy lags one render behind the local state update.
+  const saveDataRef = useRef({ user, sessionId, mode, projectContext, messagesByMode, planCompleted, messages })
+  saveDataRef.current = { user, sessionId, mode, projectContext, messagesByMode, planCompleted, messages }
+
+  const doSave = () => {
+    const d = saveDataRef.current
+    if (!d.user) return
+    const full = { ...d.messagesByMode, [d.mode]: d.messages }
+    saveSession(d.user.uid, d.sessionId, d.mode, d.projectContext, full, d.planCompleted)
+      .catch((err) => console.error('[ArchPal] session save failed:', err))
+  }
+
+  // ── Save after every completed agent response ──────────────────────────────
+  const prevLoadingRef = useRef(isLoading)
+  useEffect(() => {
+    const wasLoading = prevLoadingRef.current
+    prevLoadingRef.current = isLoading
+    if (wasLoading && !isLoading) doSave()
+  }, [isLoading]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleNewChat = async () => {
+    doSave()
     resetSession()
     navigate('/')
   }
+
+  // Best-effort save when user switches tabs or closes the window
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') doSave()
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reload messages when mode changes (navigating between mode pills).
   // Use prevModeRef so this skips on first mount AND on StrictMode double-invoke
@@ -292,7 +331,7 @@ export function ChatPage() {
     : `Message ${activeMode.label.replace(' Mode', '').replace(' & Writing', '')}...`
 
   return (
-    <div className="flex flex-col bg-bg-card font-outfit" style={{ minHeight: '100vh', height: '100dvh' }}>
+    <div className="flex flex-col bg-bg-card font-outfit" style={{ height: '100dvh', overflow: 'hidden' }}>
       {/* ─── Desktop Layout (1200px+) ─── */}
       <div className="hidden desktop:flex flex-col h-screen">
         {/* Chat Header */}

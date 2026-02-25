@@ -33,7 +33,7 @@ export function ChatInput({ value, onChange, onSubmit, placeholder, disabled }: 
         placeholder={placeholder ?? 'Describe your project or ask a question...'}
         disabled={disabled}
         className="flex-1 font-outfit bg-transparent text-text-primary placeholder:text-text-muted focus:outline-none disabled:cursor-not-allowed"
-        style={{ fontSize: 15 }}
+        style={{ fontSize: 16 }}
       />
       <button
         onClick={onSubmit}

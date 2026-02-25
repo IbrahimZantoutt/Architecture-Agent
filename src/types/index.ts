@@ -56,3 +56,26 @@ export interface SessionState {
   messagesByMode: Partial<Record<Mode, Message[]>>
   planCompleted: boolean
 }
+
+// ─── Firestore-serializable message (Date → number) ───────────────────────────
+export interface StoredMessage {
+  id: string
+  role: 'user' | 'agent'
+  content: string
+  timestamp: number       // ms since epoch
+  status?: MessageStatus
+}
+
+// ─── A full session document stored in Firestore ──────────────────────────────
+export interface StoredSession {
+  id: string              // Firestore doc ID (same as sessionId)
+  userId: string
+  sessionId: string
+  mode: Mode              // last active mode
+  title: string           // first user message (truncated)
+  projectContext: ProjectContext
+  messagesByMode: Partial<Record<Mode, StoredMessage[]>>
+  planCompleted: boolean
+  createdAt: number       // ms since epoch
+  updatedAt: number
+}

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Clock, Menu, Calculator } from 'lucide-react'
+import { Clock, Calculator, LogOut } from 'lucide-react'
 import { Logo } from '../components/ui/Logo'
 import { ChatInput } from '../components/ui/ChatInput'
 import { ModeCard } from '../components/ui/ModeCard'
 import { MODES } from '../lib/modes'
+import { useAuth } from '../contexts/AuthContext'
 import type { Mode } from '../types'
 
 // Infer the best mode from a free-form message. Falls back to 'plan' for
@@ -40,10 +41,83 @@ function detectMode(message: string): Mode {
   return 'plan'
 }
 
+function UserMenu() {
+  const { user, signOut } = useAuth()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const initials = user?.displayName
+    ? user.displayName.charAt(0).toUpperCase()
+    : user?.email?.charAt(0).toUpperCase() ?? '?'
+
+  const label = user?.displayName ?? user?.email ?? ''
+
+  return (
+    <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-center font-outfit font-semibold text-white rounded-full transition-opacity hover:opacity-80"
+        style={{
+          width: 34,
+          height: 34,
+          fontSize: 14,
+          backgroundColor: '#E8607A',
+          flexShrink: 0,
+        }}
+        title={label}
+      >
+        {initials}
+      </button>
+
+      {open && (
+        <div
+          className="bg-bg-card border border-border rounded-[12px] shadow-sm flex flex-col"
+          style={{
+            position: 'absolute',
+            top: 42,
+            right: 0,
+            minWidth: 200,
+            zIndex: 9999,
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            className="font-outfit border-b border-border"
+            style={{ padding: '12px 16px' }}
+          >
+            <p className="font-semibold text-text-primary" style={{ fontSize: 14 }}>
+              {user?.displayName ?? 'Your account'}
+            </p>
+            <p className="text-text-muted" style={{ fontSize: 12, marginTop: 2 }}>
+              {user?.email}
+            </p>
+          </div>
+          <button
+            onClick={async () => { await signOut() }}
+            className="flex items-center gap-2 font-outfit text-text-secondary hover:bg-bg-soft transition-colors"
+            style={{ padding: '10px 16px', fontSize: 14 }}
+          >
+            <LogOut size={15} color="#6B7280" />
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function HomePage() {
   const navigate = useNavigate()
   const [inputValue, setInputValue] = useState('')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleSubmit = () => {
     if (!inputValue.trim()) return
@@ -56,13 +130,13 @@ export function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-soft font-outfit flex flex-col">
+    <div className="bg-bg-soft font-outfit flex flex-col">
       {/* ─── Desktop Layout ─── */}
       <div className="hidden md:flex flex-col min-h-screen">
         {/* Header */}
         <header className="flex items-center justify-between w-full anim-fade-in" style={{ padding: '16px 48px' }}>
           <Logo size="lg" />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/calculators')}
               className="flex items-center gap-1.5 bg-bg-card rounded-[10px] border border-border font-outfit font-medium text-text-secondary hover:border-border-strong transition-colors"
@@ -72,12 +146,14 @@ export function HomePage() {
               Calculators
             </button>
             <button
+              onClick={() => navigate('/history')}
               className="flex items-center gap-1.5 bg-bg-card rounded-[10px] border border-border font-outfit font-medium text-text-secondary hover:border-border-strong transition-colors"
               style={{ padding: '8px 14px', fontSize: 13 }}
             >
               <Clock size={16} color="#6B7280" />
               History
             </button>
+            <UserMenu />
           </div>
         </header>
 
@@ -163,7 +239,7 @@ export function HomePage() {
       </div>
 
       {/* ─── Mobile Layout ─── */}
-      <div className="flex flex-col min-h-screen md:hidden">
+      <div className="flex flex-col md:hidden" style={{ minHeight: '100dvh' }}>
         {/* Mobile Header */}
         <header
           className="flex items-center justify-between w-full anim-fade-in"
@@ -179,13 +255,7 @@ export function HomePage() {
               <Calculator size={16} color="#6B7280" />
               Calculators
             </button>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex items-center justify-center bg-bg-card rounded-[10px] border border-border"
-              style={{ width: 36, height: 36 }}
-            >
-              <Menu size={18} color="#6B7280" />
-            </button>
+            <UserMenu />
           </div>
         </header>
 

@@ -2,8 +2,10 @@
 // Project context persists when switching between modes so students never repeat themselves.
 
 import { createContext, useContext, useCallback, useState, useRef } from 'react'
+import { flushSync } from 'react-dom'
 import type { ReactNode } from 'react'
-import type { Mode, Message, ProjectContext, SessionState } from '../types'
+import type { Mode, Message, ProjectContext, SessionState, StoredSession } from '../types'
+import { deserializeMessage } from '../lib/firestore'
 
 // ─── Context shape ────────────────────────────────────────────────────────────
 interface SessionContextValue {
@@ -18,6 +20,7 @@ interface SessionContextValue {
   setMessagesForMode: (mode: Mode, messages: Message[]) => void
   markPlanCompleted: () => void
   resetSession: () => void
+  loadStoredSession: (stored: StoredSession) => void
 }
 
 const SessionCtx = createContext<SessionContextValue | null>(null)
@@ -71,6 +74,26 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setState(makeInitialState())
   }, [])
 
+  // Load a stored Firestore session into local state synchronously (use flushSync
+  // at call-site when navigating immediately after to guarantee context is updated
+  // before the new route mounts).
+  const loadStoredSession = useCallback((stored: StoredSession) => {
+    const restoredMessages: Partial<Record<Mode, Message[]>> = {}
+    for (const [m, msgs] of Object.entries(stored.messagesByMode)) {
+      if (msgs?.length) {
+        restoredMessages[m as Mode] = msgs.map(deserializeMessage)
+      }
+    }
+    flushSync(() => {
+      setState({
+        sessionId: stored.sessionId,
+        projectContext: stored.projectContext,
+        messagesByMode: restoredMessages,
+        planCompleted: stored.planCompleted,
+      })
+    })
+  }, [])
+
   return (
     <SessionCtx.Provider
       value={{
@@ -83,6 +106,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         setMessagesForMode,
         markPlanCompleted,
         resetSession,
+        loadStoredSession,
       }}
     >
       {children}
